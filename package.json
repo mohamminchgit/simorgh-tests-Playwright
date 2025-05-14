@@ -1,0 +1,29 @@
+{
+  "name": "simorgh-tests-playwright",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "npx playwright test",
+    "test:headed": "npx playwright test --headed",
+    "test:debug": "npx playwright test --debug",
+    "test:ui": "npx playwright test --ui",
+    "report": "npx playwright show-report",
+    "record": "npx playwright codegen --ignore-https-errors https://crm7.simorgh34000.test/auth/login"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com//mohamminchgit/simorgh-tests-playwright.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.52.0",
+    "@types/node": "^22.15.17"
+  },
+  "dependencies": {
+    "dayjs": "^1.11.13",
+    "dayjs-plugin-utc": "^0.1.2"
+  }
+}
