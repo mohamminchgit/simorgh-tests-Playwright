@@ -112,42 +112,15 @@ test.describe.serial('Smoke test پنل ادمین', () => {
   // تست صفحات ادمین
   // ------------------------------------
   for (const page of adminPages) {
-    test(`بررسی صفحه: ${page.name}`, async ({ browser }) => {
+    test(`بررسی صفحه: ${page.name}`, async () => {
       try {
         console.log(`🔍 در حال بررسی صفحه: ${page.name}`);
         
-        // ایجاد نام فایل امن برای ویدیو
+        // ایجاد نام فایل امن برای ویدیو و اسکرین‌شات
         const safeName = createSafeFileName(page.path);
         
-        // ایجاد پوشه ویدیو اختصاصی برای هر تست
-        const videoDir = `./test-results/videos/${safeName}`;
-        if (!fs.existsSync(videoDir)) {
-          fs.mkdirSync(videoDir, { recursive: true });
-        }
-        
-        // تنظیمات ضبط ویدیو برای این تست
-        const testContext = await browser.newContext({
-          recordVideo: {
-            dir: videoDir,
-            size: { width: 1920, height: 1080 }
-          },
-          ignoreHTTPSErrors: true
-        });
-        
-        // ایجاد صفحه جدید برای ضبط ویدیو
-        const videoPage = await testContext.newPage();
-        
-        // نسخه‌برداری از کوکی‌های لاگین به صفحه جدید
-        const cookies = await context.cookies();
-        await testContext.addCookies(cookies);
-        
-        // رفتن به صفحه مورد نظر
-        await videoPage.goto(page.path, { 
-          waitUntil: 'networkidle',
-          timeout: 120000 // 2 دقیقه برای بارگذاری کامل
-        });
-        
-        // رفتن به صفحه اصلی با استفاده از صفحه اشتراکی
+        // رفتن به صفحه مورد نظر با استفاده از همان صفحه لاگین شده
+        console.log(`🌐 در حال مراجعه به آدرس: ${page.path}`);
         await adminPage.goto(page.path, { 
           waitUntil: 'networkidle',
           timeout: 120000 // 2 دقیقه برای بارگذاری کامل
@@ -163,6 +136,14 @@ test.describe.serial('Smoke test پنل ادمین', () => {
         } else {
           await adminPage.waitForTimeout(2000); // 2 ثانیه برای بقیه صفحات
         }
+        
+        // بررسی آدرس صفحه فعلی
+        const currentUrl = adminPage.url();
+        console.log(`📍 آدرس فعلی: ${currentUrl}`);
+        
+        // بررسی اینکه به صفحه لاگین ریدایرکت نشده باشیم
+        expect(currentUrl).not.toContain('/auth/login');
+        expect(currentUrl).not.toContain('/admin/auth/login');
         
         // بررسی موفق بودن درخواست
         const status = await adminPage.evaluate(() => document.readyState);
@@ -182,16 +163,6 @@ test.describe.serial('Smoke test پنل ادمین', () => {
           path: `./test-results/screenshots/${safeName}.png`,
           fullPage: true
         });
-        
-        // کلیک در صفحه برای دیدن تغییرات در ویدیو
-        await videoPage.click('body');
-        
-        // کمی مکث قبل از بستن صفحه برای ذخیره ویدیو
-        await videoPage.waitForTimeout(1000);
-        
-        // بستن صفحه ویدیو 
-        await videoPage.close();
-        await testContext.close();
         
         console.log(`✅ صفحه ${page.name} با موفقیت بررسی شد`);
         
